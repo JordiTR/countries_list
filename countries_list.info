@@ -1,0 +1,7 @@
+name = Countries list
+description = Provides a field for entities using the list of countries in core.
+core = 7.x
+version = 1.0.3
+package = Fields
+
+files[] = countries_list.module

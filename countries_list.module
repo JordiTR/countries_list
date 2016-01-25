@@ -1,0 +1,142 @@
+<?php
+
+/**
+ * @file
+ * Defines a field type to display the list of countries in core
+ */
+
+/**
+ * Implements hook_field_info().
+ */
+function countries_list_field_info() {
+  return array(
+    'countries_list_field' => array(
+      'label' => t('Countries'),
+      'description' => t('List of countries in core to be used as a field.'),
+      'default_widget' => 'countries_list_field_widget',
+      'default_formatter' => 'countries_list_field_formatter',
+      'settings' => array(),
+      'instance_settings' => array(),
+    )
+  );
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function countries_list_field_formatter_info() {
+  return array(
+    'formatter_country_name' => array(
+      'label' => t('Country name'),
+      'field types' => array('countries_list_field')
+    ),
+    'formatter_country_code' => array(
+      'label' => t('Country code'),
+      'field types' => array('countries_list_field')
+    ),
+    'formatter_country_code_lowercase' => array(
+      'label' => t('Country code lowercase'),
+      'field types' => array('countries_list_field')
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function countries_list_field_formatter_view($entity_type, $entity, $field, $instance, $lang, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+    case 'formatter_country_name':
+      foreach ($items as $delta => $item) {
+        $country_code = $item['country_code'];
+        if ($country_code == '0') {
+          return;
+        }
+        $countries = country_get_list();
+        $country_name = t($countries[$country_code]);
+
+        $element[$delta]['#markup'] = $country_name;
+      }
+      break;
+    
+    case 'formatter_country_code':
+      foreach ($items as $delta => $item) {
+        $country_code = $item['country_code'];
+        if ($country_code == '0') {
+          return;
+        }
+        $element[$delta]['#markup'] = $country_code;
+      }
+      break;
+    
+    case 'formatter_country_code_lowercase':
+      foreach ($items as $delta => $item) {
+        $country_code = strtolower($item['country_code']);
+        if ($country_code == '0') {
+          return;
+        }
+        $element[$delta]['#markup'] = $country_code;
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function countries_list_field_widget_form(&$form, &$form_state, $field, $instance, $lang, $items, $delta, $element) {
+  switch ($instance['widget']['type']) {
+    case 'countries_list_field_widget':
+      // Display the form to let the user pick a country
+      // country_get_list() is a core function on includes/locale.inc
+      $options = country_get_list();
+      $element['country_code'] = array(
+        '#type' => 'select',
+        '#title' => $element['#title'],
+        '#options' => $options,
+        '#required' => $element['#required'],
+        '#empty_value' => 0,
+        '#default_value' => isset($items[$delta]['country_code']) ? $items[$delta]['country_code'] : NULL,
+      );
+      break;
+  }
+
+  return $element;
+}
+
+function countries_list_widget_error($element, $error, $form, &$form_state) {
+  switch ($error['error']) {
+    case 'countries_list_field_invalid':
+      form_error($element, $error['message']);
+      break;
+  }
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function countries_list_field_is_empty($item, $field) {
+  if (!empty($item['countries_list_field'])) {
+    return true;
+  }
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function countries_list_field_widget_info() {
+  return array(
+    'countries_list_field_widget' => array(
+      'label' => t('List of countries'),
+      'field types' => array('countries_list_field'),
+      'settings' => array(),
+      'behaviors' => array(
+        'default value' => FIELD_BEHAVIOR_NONE
+      )
+    )
+  );
+}

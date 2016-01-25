@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Installation functions for core Countries list module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function countries_list_field_schema($field) {
+  $schema = array(
+    'columns' => array(
+      'country_code' => array(
+        'type' => 'varchar',
+        'not null' => FALSE,
+        'length' => 11,
+      ),
+    ),
+  );
+
+  return $schema;
+}
