@@ -65,4 +65,4 @@ VERSIONS
 1.0.2 - formatter had php notice when rendering the field if it was empty: solved
 1.0.3 - formatter now supports fields with multiple values
 
-Commited to GitHub.com
+Commited to GitHub.com -- And verified.
